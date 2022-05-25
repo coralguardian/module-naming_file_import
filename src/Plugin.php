@@ -15,5 +15,7 @@ class Plugin
         do_action(\Hyperion\RestAPI\Plugin::ADD_API_ENDPOINT_ACTION, new ReceiveNamingFileEndPoint());
         do_action(\Hyperion\RestAPI\Plugin::ADD_API_ENDPOINT_ACTION, new GetRecipientsFileEndPoint());
         do_action(\Hyperion\RestAPI\Plugin::ADD_API_ENDPOINT_ACTION, new ReceiveRecipientsFileEndPoint());
+        do_action(\Hyperion\RestAPI\Plugin::ADD_API_ENDPOINT_ACTION, new \D4rk0snet\NamingFileImport\API\Admin\GetNamingFileEndPoint());
+        do_action(\Hyperion\RestAPI\Plugin::ADD_API_ENDPOINT_ACTION, new \D4rk0snet\NamingFileImport\API\Admin\GetRecipientsFileEndPoint());
     }
 }
