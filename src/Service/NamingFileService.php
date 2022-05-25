@@ -72,7 +72,7 @@ class NamingFileService
         foreach ($names as $index => $name) {
             /** @var Seeder $selectedSeeder */
             $selectedSeeder = $seeders[$index % $seedersCount];
-            $selectedPicture = $seeders[$index % $picturesCount];
+            $selectedPicture = $pictures[$index % $picturesCount];
 
             $adopteeEntity = new AdopteeEntity(
                 name: $name,
