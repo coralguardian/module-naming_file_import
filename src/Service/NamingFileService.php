@@ -3,6 +3,7 @@
 namespace D4rk0snet\NamingFileImport\Service;
 
 use D4rk0snet\Adoption\Entity\AdopteeEntity;
+use D4rk0snet\Adoption\Entity\AdoptionEntity;
 use D4rk0snet\Adoption\Enums\AdoptedProduct;
 use D4rk0snet\Adoption\Enums\Seeder;
 use Hyperion\Doctrine\Service\DoctrineService;
@@ -10,9 +11,9 @@ use PhpOffice\PhpSpreadsheet\Reader\Xlsx;
 
 class NamingFileService extends FileService
 {
-    public static function importDataFromFile(string $filename)
+    public static function importDataFromFile(string $filename, AdoptionEntity $forceAdoptionEntity = null)
     {
-        $adoptionEntity = self::getAdoptionEntity($filename);
+        $adoptionEntity = $forceAdoptionEntity ?? self::getAdoptionEntity($filename);
         $reader = new Xlsx();
         $spreadsheet = $reader->load($filename);
         $names = [];

@@ -4,16 +4,15 @@ namespace D4rk0snet\NamingFileImport\Service;
 
 use D4rk0snet\Adoption\Entity\Friend;
 use D4rk0snet\Adoption\Entity\GiftAdoption;
-use Doctrine\Common\Collections\Collection;
 use Hyperion\Doctrine\Service\DoctrineService;
 use PhpOffice\PhpSpreadsheet\Reader\Xlsx;
 
 class RecipientFileService extends FileService
 {
-    public static function importDataFromFile(string $filename)
+    public static function importDataFromFile(string $filename, GiftAdoption $forceAdoptionEntity = null)
     {
         /** @var GiftAdoption $adoptionEntity */
-        $adoptionEntity = self::getAdoptionEntity($filename);
+        $adoptionEntity = $forceAdoptionEntity ?? self::getAdoptionEntity($filename);
         $reader = new Xlsx();
         $spreadsheet = $reader->load($filename);
         $lineIndex = 8;
