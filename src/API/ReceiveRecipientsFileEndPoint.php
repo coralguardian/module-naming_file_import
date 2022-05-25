@@ -12,13 +12,8 @@ class ReceiveRecipientsFileEndPoint extends APIEnpointAbstract
 {
     public static function callback(WP_REST_Request $request): WP_REST_Response
     {
-        $payload = json_decode($request->get_body(), false, 512, JSON_THROW_ON_ERROR);
         if (!isset($_FILES['recipient_file'])) {
             return new WP_REST_Response("missing file", 400);
-        }
-
-        if ($payload === null) {
-            return APIManagement::APIError("Invalid body content", 400);
         }
 
         try {

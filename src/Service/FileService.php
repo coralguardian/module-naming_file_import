@@ -43,7 +43,7 @@ abstract class FileService
         $adoptionUUID = $spreadsheet->getSheet(0)->getCell('B5')->getValue();
 
         /** @var AdoptionEntity | null $adoptionEntity */
-        $adoptionEntity = DoctrineService::getEntityManager()->getRepository(DonationEntity::class)->getByPostId($adoptionUUID);
+        $adoptionEntity = DoctrineService::getEntityManager()->getRepository(DonationEntity::class)->find($adoptionUUID);
         if (null === $adoptionEntity) {
             unlink($filename);
             throw new \Exception("Impossible de retrouver l'adoption ", 400);

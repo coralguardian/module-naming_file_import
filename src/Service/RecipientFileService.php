@@ -10,7 +10,7 @@ use PhpOffice\PhpSpreadsheet\Reader\Xlsx;
 
 class RecipientFileService extends FileService
 {
-        public static function importDataFromFile(string $filename)
+    public static function importDataFromFile(string $filename)
     {
         /** @var GiftAdoption $adoptionEntity */
         $adoptionEntity = self::getAdoptionEntity($filename);
@@ -20,21 +20,18 @@ class RecipientFileService extends FileService
 
         try {
             DoctrineService::getEntityManager()->beginTransaction();
-            /** @var Collection $giftCodes */
-            $giftCodes = $adoptionEntity->getGiftCodes();
 
-            while ($spreadsheet->getSheet(0)->getCell('A' . $lineIndex)->getValue() !== "") {
+            foreach ($adoptionEntity->getGiftCodes() as $giftCode) {
                 $friend = new Friend(
                     $spreadsheet->getSheet(0)->getCell('B' . $lineIndex)->getValue(),
                     $spreadsheet->getSheet(0)->getCell('C' . $lineIndex)->getValue(),
                     $spreadsheet->getSheet(0)->getCell('D' . $lineIndex)->getValue(),
                     $adoptionEntity,
-                    $giftCodes->current()
+                    $giftCode->getGiftCode()
                 );
                 DoctrineService::getEntityManager()->persist($friend);
 
                 $lineIndex++;
-                $giftCodes->next();
             }
 
             if ($lineIndex - 8 !== $adoptionEntity->getQuantity()) {
