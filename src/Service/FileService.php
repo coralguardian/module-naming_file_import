@@ -17,11 +17,11 @@ abstract class FileService
      */
     public static function getExcelFilename(string $filename, ?DonationEntity $adoptionEntity) : string
     {
-        if($adoptionEntity !== null) {
-            $reader = new Xlsx();
-            /** @var \PhpOffice\PhpSpreadsheet\Spreadsheet $spreadsheet */
-            $spreadSheet = $reader->load(__DIR__ . "/../Files/$filename");
+        $reader = new Xlsx();
+        /** @var \PhpOffice\PhpSpreadsheet\Spreadsheet $spreadsheet */
+        $spreadSheet = $reader->load(__DIR__ . "/../Files/$filename");
 
+        if($adoptionEntity !== null) {
             $url = $adoptionEntity->getLang() === Language::FR ? "/entreprise" : "/company";
             $url = home_url("$url?orderId={$adoptionEntity->getUuid()}&step=adoption");
 
@@ -66,13 +66,12 @@ abstract class FileService
 
     public static function fillFileAccordingToAdoption(?string $adoptionUuid, ?Language $forceLang)
     {
-        if($adoptionUuid === null) {
+        if($adoptionUuid !== null) {
             /** @var DonationEntity | null $adoptionEntity */
             $adoptionEntity = DoctrineService::getEntityManager()->getRepository(GiftAdoption::class)->find($adoptionUuid);
             if ($adoptionEntity === null) {
                 throw new \Exception("Adoption non trouvé");
             }
-
         }
 
         if(isset($adoptionEntity)) {
