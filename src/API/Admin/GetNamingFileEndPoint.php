@@ -1,7 +1,8 @@
 <?php
 
-namespace D4rk0snet\NamingFileImport\API;
+namespace D4rk0snet\NamingFileImport\API\Admin;
 
+use D4rk0snet\Coralguardian\Enums\Language;
 use D4rk0snet\NamingFileImport\Service\NamingFileService;
 use Hyperion\RestAPI\APIEnpointAbstract;
 use Hyperion\RestAPI\APIManagement;
@@ -13,7 +14,7 @@ class GetNamingFileEndPoint extends APIEnpointAbstract
     public static function callback(WP_REST_Request $request): WP_REST_Response
     {
         try {
-            $filename = NamingFileService::fillFileAccordingToAdoption($request->get_param('adoption_uuid'), null);
+            $filename = NamingFileService::fillFileAccordingToAdoption(null, Language::FR);
 
             return APIManagement::APIClientDownloadWithURL($filename, 'naming_file.xlsx');
         } catch (\Exception $exception) {
@@ -28,11 +29,15 @@ class GetNamingFileEndPoint extends APIEnpointAbstract
 
     public static function getPermissions(): string
     {
-        return "__return_true";
+        if(current_user_can('manage_options')) {
+            return "__return_true";
+        }
+
+        return "__return_false";
     }
 
     public static function getEndpoint(): string
     {
-        return "namingFile";
+        return "admin/namingFile";
     }
 }
