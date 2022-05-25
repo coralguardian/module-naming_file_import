@@ -4,8 +4,10 @@ namespace D4rk0snet\NamingFileImport\Service;
 
 use D4rk0snet\Adoption\Entity\AdopteeEntity;
 use D4rk0snet\Adoption\Entity\AdoptionEntity;
+use D4rk0snet\Adoption\Enums\AdoptedProduct;
 use D4rk0snet\Adoption\Enums\Seeder;
 use D4rk0snet\Coralguardian\Enums\Language;
+use D4rk0snet\Donation\Entity\DonationEntity;
 use Hyperion\Doctrine\Service\DoctrineService;
 use PhpOffice\PhpSpreadsheet\Reader\Xlsx;
 
@@ -44,9 +46,8 @@ class NamingFileService
         return $filename;
     }
 
-    public static function importDataFromFile()
+    public static function importDataFromFile(string $filename)
     {
-        $filename = self::saveUploadedFile();
         $adoptionEntity = self::getAdoptionEntity($filename);
         $reader = new Xlsx();
         $spreadsheet = $reader->load($filename);
@@ -63,26 +64,28 @@ class NamingFileService
             throw new \Exception("Le nombre de noms renseignés est incorrect", 400);
         }
 
-        foreach ($names as $name) {
+        $seeders = Seeder::randomizeSeeder();
+        $pictures = AdoptedProduct::getRandomizedProductImages($adoptionEntity->getAdoptedProduct());
+        $seedersCount = count($seeders);
+        $picturesCount = count($pictures);
+
+        foreach ($names as $index => $name) {
+            /** @var Seeder $selectedSeeder */
+            $selectedSeeder = $seeders[$index % $seedersCount];
+            $selectedPicture = $seeders[$index % $picturesCount];
+
             $adopteeEntity = new AdopteeEntity(
                 name: $name,
-                seeder: Seeder::DULAH,
+                seeder: $selectedSeeder,
                 adoption: $adoptionEntity,
-                adopteeDatetime: new \DateTime()
+                adopteeDatetime: new \DateTime(),
+                picture: $selectedPicture
             );
 
             DoctrineService::getEntityManager()->persist($adopteeEntity);
         }
 
         DoctrineService::getEntityManager()->flush();
-    }
-
-    private static function saveUploadedFile() : string
-    {
-        $filename = tempnam("/tmp", "") . ".xlsx";
-        move_uploaded_file($_FILES['adoption_file']["tmp_name"], $filename);
-
-        return $filename;
     }
 
     private static function getAdoptionEntity(string $filename) : AdoptionEntity

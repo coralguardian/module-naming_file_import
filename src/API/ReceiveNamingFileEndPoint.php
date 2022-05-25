@@ -22,7 +22,10 @@ class ReceiveNamingFileEndPoint extends APIEnpointAbstract
         }
 
         try {
-            NamingFileService::importDataFromFile();
+            $filename = tempnam("/tmp", "") . ".xlsx";
+            move_uploaded_file($_FILES['adoption_file']["tmp_name"], $filename);
+
+            NamingFileService::importDataFromFile($filename);
             return APIManagement::APIOk();
         } catch (\Exception $exception) {
             return APIManagement::APIError($exception->getMessage(), $exception->getCode());
