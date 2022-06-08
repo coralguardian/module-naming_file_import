@@ -4,6 +4,7 @@ namespace D4rk0snet\NamingFileImport\Service;
 
 use D4rk0snet\Adoption\Entity\AdoptionEntity;
 use D4rk0snet\Adoption\Entity\GiftAdoption;
+use D4rk0snet\Adoption\Service\RedirectionService;
 use D4rk0snet\Coralguardian\Enums\Language;
 use D4rk0snet\Donation\Entity\DonationEntity;
 use Exception;
@@ -15,15 +16,14 @@ abstract class FileService
     /**
      * adoptionEntity can be null for admin management.
      */
-    public static function getExcelFilename(string $filename, ?DonationEntity $adoptionEntity): string
+    public static function getExcelFilename(string $filename, ?AdoptionEntity $adoptionEntity): string
     {
         $reader = new Xlsx();
         /** @var \PhpOffice\PhpSpreadsheet\Spreadsheet $spreadsheet */
         $spreadSheet = $reader->load(__DIR__ . "/../Files/$filename");
 
         if ($adoptionEntity !== null) {
-            $url = $adoptionEntity->getLang() === Language::FR ? "/adoption-entreprise" : "/company";
-            $url = home_url("$url?adoptionUuid={$adoptionEntity->getUuid()}&step=adoption");
+            $url = RedirectionService::buildRedirectionUrl($adoptionEntity);
 
             $worksheet = $spreadSheet->getActiveSheet();
             $worksheet->getCell('B4')->setValue("Lien de dépose");

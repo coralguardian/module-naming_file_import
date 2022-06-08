@@ -13,7 +13,7 @@ class GetRecipientsFileEndPoint extends APIEnpointAbstract
     public static function callback(WP_REST_Request $request): WP_REST_Response
     {
         try {
-            $filename = RecipientFileService::fillFileAccordingToAdoption($request->get_param('adoption_uuid'));
+            $filename = RecipientFileService::fillFileAccordingToAdoption($request->get_param('adoption_uuid'), null);
 
             return APIManagement::APIClientDownloadWithURL($filename, 'recipient_file.xlsx');
         } catch (\Exception $exception) {

@@ -4,6 +4,8 @@ namespace D4rk0snet\NamingFileImport\Service;
 
 use D4rk0snet\Adoption\Entity\Friend;
 use D4rk0snet\Adoption\Entity\GiftAdoption;
+use D4rk0snet\Coralguardian\Event\GiftCodeSent;
+use D4rk0snet\Coralguardian\Event\RecipientDone;
 use Hyperion\Doctrine\Service\DoctrineService;
 use PhpOffice\PhpSpreadsheet\Reader\Xlsx;
 
@@ -25,11 +27,9 @@ class RecipientFileService extends FileService
                     $spreadsheet->getSheet(0)->getCell('B' . $lineIndex)->getValue(),
                     $spreadsheet->getSheet(0)->getCell('C' . $lineIndex)->getValue(),
                     $spreadsheet->getSheet(0)->getCell('D' . $lineIndex)->getValue(),
-                    $adoptionEntity,
-                    $giftCode->getGiftCode()
+                    $giftCode
                 );
                 DoctrineService::getEntityManager()->persist($friend);
-
                 $lineIndex++;
             }
 
@@ -44,5 +44,11 @@ class RecipientFileService extends FileService
             DoctrineService::getEntityManager()->rollback();
             throw new $exception;
         }
+
+        foreach ($adoptionEntity->getGiftCodes() as $giftCode) {
+            GiftCodeSent::sendEvent($giftCode, 1);
+        }
+
+        RecipientDone::sendEvent($adoptionEntity);
     }
 }
