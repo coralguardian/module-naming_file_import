@@ -6,6 +6,7 @@ use D4rk0snet\Adoption\Entity\AdopteeEntity;
 use D4rk0snet\Adoption\Entity\AdoptionEntity;
 use D4rk0snet\Adoption\Enums\AdoptedProduct;
 use D4rk0snet\Adoption\Enums\Seeder;
+use D4rk0snet\Coralguardian\Event\NamingDone;
 use Hyperion\Doctrine\Service\DoctrineService;
 use PhpOffice\PhpSpreadsheet\Reader\Xlsx;
 
@@ -14,6 +15,12 @@ class NamingFileService extends FileService
     public static function importDataFromFile(string $filename, AdoptionEntity $forceAdoptionEntity = null)
     {
         $adoptionEntity = $forceAdoptionEntity ?? self::getAdoptionEntity($filename);
+
+        if (count($adoptionEntity->getAdoptees()) === $adoptionEntity->getQuantity()) {
+            unlink($filename);
+            throw new \Exception("Les adoptions de cette commande ont déjà été réalisées", 400);
+        }
+
         $reader = new Xlsx();
         $spreadsheet = $reader->load($filename);
         $names = [];
@@ -51,5 +58,6 @@ class NamingFileService extends FileService
         }
 
         DoctrineService::getEntityManager()->flush();
+        NamingDone::sendEvent($adoptionEntity);
     }
 }

@@ -15,15 +15,15 @@ abstract class FileService
     /**
      * adoptionEntity can be null for admin management.
      */
-    public static function getExcelFilename(string $filename, ?DonationEntity $adoptionEntity) : string
+    public static function getExcelFilename(string $filename, ?DonationEntity $adoptionEntity): string
     {
         $reader = new Xlsx();
         /** @var \PhpOffice\PhpSpreadsheet\Spreadsheet $spreadsheet */
         $spreadSheet = $reader->load(__DIR__ . "/../Files/$filename");
 
-        if($adoptionEntity !== null) {
-            $url = $adoptionEntity->getLang() === Language::FR ? "/entreprise" : "/company";
-            $url = home_url("$url?orderId={$adoptionEntity->getUuid()}&step=adoption");
+        if ($adoptionEntity !== null) {
+            $url = $adoptionEntity->getLang() === Language::FR ? "/adoption-entreprise" : "/company";
+            $url = home_url("$url?adoptionUuid={$adoptionEntity->getUuid()}&step=adoption");
 
             $worksheet = $spreadSheet->getActiveSheet();
             $worksheet->getCell('B4')->setValue("Lien de dépose");
@@ -43,7 +43,7 @@ abstract class FileService
         return $xlsFilename;
     }
 
-    public static function getAdoptionEntity(string $filename) : DonationEntity
+    public static function getAdoptionEntity(string $filename): DonationEntity
     {
         $reader = new Xlsx();
         $spreadsheet = $reader->load($filename);
@@ -56,36 +56,31 @@ abstract class FileService
             throw new \Exception("Impossible de retrouver l'adoption ", 400);
         }
 
-        if (count($adoptionEntity->getAdoptees()) === $adoptionEntity->getQuantity()) {
-            unlink($filename);
-            throw new \Exception("Les adoptions de cette commande ont déjà été réalisées", 400);
-        }
-
         return $adoptionEntity;
     }
 
     public static function fillFileAccordingToAdoption(?string $adoptionUuid, ?Language $forceLang)
     {
-        if($adoptionUuid !== null) {
+        if ($adoptionUuid !== null) {
             /** @var DonationEntity | null $adoptionEntity */
-            $adoptionEntity = DoctrineService::getEntityManager()->getRepository(GiftAdoption::class)->find($adoptionUuid);
+            $adoptionEntity = DoctrineService::getEntityManager()->getRepository(AdoptionEntity::class)->find($adoptionUuid);
             if ($adoptionEntity === null) {
                 throw new \Exception("Adoption non trouvé");
             }
         }
 
-        if(isset($adoptionEntity)) {
+        if (isset($adoptionEntity)) {
             $lang = $forceLang ?? $adoptionEntity->getLang();
         } else {
-            if($forceLang === null) {
+            if ($forceLang === null) {
                 throw new \Exception("Without entity, force lang must be specified");
             }
             $lang = $forceLang;
         }
 
-        if(static::class === NamingFileService::class) {
+        if (static::class === NamingFileService::class) {
             $filename = $lang === Language::FR ? 'FR-coralguardian-coral-sheet-name.xlsx' : 'EN-coralguardian-coral-sheet-name.xlsx';
-        } else if(static::class === RecipientFileService::class) {
+        } else if (static::class === RecipientFileService::class) {
             $filename = $lang === Language::FR ? 'FR-coralguardian-recipient-sheet-name.xlsx' : 'EN-coralguardian-recipient-sheet-name.xlsx';
         } else {
             throw new Exception("Invalid class name");

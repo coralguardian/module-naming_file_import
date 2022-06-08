@@ -23,7 +23,7 @@ class ReceiveNamingFileEndPoint extends APIEnpointAbstract
             NamingFileService::importDataFromFile($filename);
             return APIManagement::APIOk();
         } catch (\Exception $exception) {
-            return APIManagement::APIError($exception->getMessage(), $exception->getCode());
+            return APIManagement::APIForbidden($exception->getMessage());
         }
     }
 
