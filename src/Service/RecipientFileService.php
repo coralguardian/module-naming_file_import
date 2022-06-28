@@ -41,7 +41,6 @@ class RecipientFileService extends FileService
                 throw new \Exception("Le nombre de noms renseignés est incorrect", 400);
             }
 
-            DoctrineService::getEntityManager()->flush();
             DoctrineService::getEntityManager()->commit();
         } catch (\Exception $exception) {
             DoctrineService::getEntityManager()->rollback();
