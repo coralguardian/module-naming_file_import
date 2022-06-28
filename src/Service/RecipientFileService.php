@@ -6,6 +6,7 @@ use D4rk0snet\Adoption\Entity\Friend;
 use D4rk0snet\Adoption\Entity\GiftAdoption;
 use D4rk0snet\Coralguardian\Event\GiftCodeSent;
 use D4rk0snet\Coralguardian\Event\RecipientDone;
+use D4rk0snet\GiftCode\Entity\GiftCodeEntity;
 use Hyperion\Doctrine\Service\DoctrineService;
 use PhpOffice\PhpSpreadsheet\Reader\Xlsx;
 
@@ -22,6 +23,7 @@ class RecipientFileService extends FileService
         try {
             DoctrineService::getEntityManager()->beginTransaction();
 
+            /** @var GiftCodeEntity $giftCode */
             foreach ($adoptionEntity->getGiftCodes() as $giftCode) {
                 $friend = new Friend(
                     $spreadsheet->getSheet(0)->getCell('B' . $lineIndex)->getValue(),
@@ -29,6 +31,7 @@ class RecipientFileService extends FileService
                     $spreadsheet->getSheet(0)->getCell('D' . $lineIndex)->getValue(),
                     $giftCode
                 );
+                $giftCode->setFriend($friend);
                 DoctrineService::getEntityManager()->persist($friend);
                 $lineIndex++;
             }
