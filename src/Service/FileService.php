@@ -3,7 +3,6 @@
 namespace D4rk0snet\NamingFileImport\Service;
 
 use D4rk0snet\Adoption\Entity\AdoptionEntity;
-use D4rk0snet\Adoption\Entity\GiftAdoption;
 use D4rk0snet\Adoption\Service\RedirectionService;
 use D4rk0snet\Coralguardian\Enums\Language;
 use D4rk0snet\Donation\Entity\DonationEntity;
@@ -59,11 +58,11 @@ abstract class FileService
         return $adoptionEntity;
     }
 
-    public static function fillFileAccordingToAdoption(?string $adoptionUuid, ?Language $forceLang)
+    public static function fillFileAccordingToAdoption(?string $stripePaymentIntentId, ?Language $forceLang)
     {
-        if ($adoptionUuid !== null) {
+        if ($stripePaymentIntentId !== null) {
             /** @var DonationEntity | null $adoptionEntity */
-            $adoptionEntity = DoctrineService::getEntityManager()->getRepository(AdoptionEntity::class)->find($adoptionUuid);
+            $adoptionEntity = DoctrineService::getEntityManager()->getRepository(AdoptionEntity::class)->findOneBy(['stripePaymentIntentId' => $stripePaymentIntentId]);
             if ($adoptionEntity === null) {
                 throw new \Exception("Adoption non trouvé");
             }

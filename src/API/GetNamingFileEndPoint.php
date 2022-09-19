@@ -13,7 +13,7 @@ class GetNamingFileEndPoint extends APIEnpointAbstract
     public static function callback(WP_REST_Request $request): WP_REST_Response
     {
         try {
-            $filename = NamingFileService::fillFileAccordingToAdoption($request->get_param('adoption_uuid'), null);
+            $filename = NamingFileService::fillFileAccordingToAdoption($request->get_param('stripePaymentIntentId'), null);
 
             return APIManagement::APIClientDownloadWithURL($filename, 'naming_file.xlsx');
         } catch (\Exception $exception) {
