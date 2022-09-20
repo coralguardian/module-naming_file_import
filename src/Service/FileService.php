@@ -58,11 +58,11 @@ abstract class FileService
         return $adoptionEntity;
     }
 
-    public static function fillFileAccordingToAdoption(?string $stripePaymentIntentId, ?Language $forceLang)
+    public static function fillFileAccordingToAdoption(?string $adoptionUuid, ?Language $forceLang)
     {
-        if ($stripePaymentIntentId !== null) {
+        if ($adoptionUuid !== null) {
             /** @var DonationEntity | null $adoptionEntity */
-            $adoptionEntity = DoctrineService::getEntityManager()->getRepository(AdoptionEntity::class)->findOneBy(['stripePaymentIntentId' => $stripePaymentIntentId]);
+            $adoptionEntity = DoctrineService::getEntityManager()->getRepository(AdoptionEntity::class)->find($adoptionUuid);
             if ($adoptionEntity === null) {
                 throw new \Exception("Adoption non trouvé");
             }
