@@ -26,7 +26,7 @@
     ],
     "require": {
         "phpoffice/phpspreadsheet": "^1.23",
-      "hyperion/doctrine" : "dev-dev",
-      "hyperion/restapi": "dev-dev"
+      "wordpress-hyperion/doctrine" : "dev-dev",
+      "wordpress-hyperion/restapi": "dev-dev"
     }
 }
