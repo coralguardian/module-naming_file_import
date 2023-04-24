@@ -12,21 +12,9 @@
             "email": "gregory@d4rk0s.net"
         }
     ],
-    "repositories": [
-      {
-        "type" : "vcs",
-        "url": "git@github.com:ds-hyperion/doctrine.git",
-        "no-api": true
-      },
-      {
-        "type" : "vcs",
-        "url": "git@github.com:ds-hyperion/restapi.git",
-        "no-api": true
-      }
-    ],
     "require": {
-        "phpoffice/phpspreadsheet": "^1.23",
-      "wordpress-hyperion/doctrine" : "dev-dev",
-      "wordpress-hyperion/restapi": "dev-dev"
+      "phpoffice/phpspreadsheet": "^1.23",
+      "wordpress-hyperion/doctrine" : "^1.0",
+      "wordpress-hyperion/restapi": "^1.0"
     }
 }
