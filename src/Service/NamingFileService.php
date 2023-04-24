@@ -3,18 +3,23 @@
 namespace D4rk0snet\NamingFileImport\Service;
 
 use D4rk0snet\Adoption\Entity\AdopteeEntity;
-use D4rk0snet\Adoption\Entity\AdoptionEntity;
 use D4rk0snet\Adoption\Enums\AdoptedProduct;
 use D4rk0snet\Adoption\Enums\Seeder;
 use D4rk0snet\Coralguardian\Event\NamingDone;
+use D4rk0snet\Donation\Entity\DonationEntity;
 use Hyperion\Doctrine\Service\DoctrineService;
 use PhpOffice\PhpSpreadsheet\Reader\Xlsx;
 
 class NamingFileService extends FileService
 {
-    public static function importDataFromFile(string $filename, AdoptionEntity $forceAdoptionEntity = null)
+    public static function importDataFromFile(string $uuid, string $filename)
     {
-        $adoptionEntity = $forceAdoptionEntity ?? self::getAdoptionEntity($filename);
+        $adoptionEntity = DoctrineService::getEntityManager()->getRepository(DonationEntity::class)->find($uuid);
+
+        if(is_null($adoptionEntity)) {
+            unlink($filename);
+            throw new \Exception("Adoption non trouvé", 400);
+        }
 
         if (count($adoptionEntity->getAdoptees()) === $adoptionEntity->getQuantity()) {
             unlink($filename);
@@ -36,8 +41,8 @@ class NamingFileService extends FileService
             throw new \Exception("Le nombre de noms renseignés est incorrect", 400);
         }
 
-        $seeders = Seeder::randomizeSeeder();
-        $pictures = AdoptedProduct::getRandomizedProductImages($adoptionEntity->getAdoptedProduct());
+        $seeders = Seeder::randomizeSeeder($adoptionEntity->getProject());
+        $pictures = AdoptedProduct::getRandomizedProductImages($adoptionEntity->getAdoptedProduct(), $adoptionEntity->getProject());
         $seedersCount = count($seeders);
         $picturesCount = count($pictures);
 
