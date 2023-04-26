@@ -43,6 +43,6 @@ class ReceiveNamingFileEndPoint extends APIEnpointAbstract
 
     public static function getEndpoint(): string
     {
-        return "adoption/(?P<".self::ADOPTION_UUID_PARAM.">^[0-9a-fA-F]{8}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{12}$)/namesFile";
+        return "adoption/(?P<".self::ADOPTION_UUID_PARAM.">[0-9a-fA-F]{8}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{12})/namesFile";
     }
 }
