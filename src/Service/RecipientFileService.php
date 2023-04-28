@@ -8,12 +8,17 @@ use D4rk0snet\Coralguardian\Event\GiftCodeSent;
 use D4rk0snet\Coralguardian\Event\RecipientDone;
 use D4rk0snet\Donation\Entity\DonationEntity;
 use D4rk0snet\GiftCode\Entity\GiftCodeEntity;
+use DateTime;
 use Hyperion\Doctrine\Service\DoctrineService;
 use PhpOffice\PhpSpreadsheet\Reader\Xlsx;
 
 class RecipientFileService extends FileService
 {
-    public static function importDataFromFile(string $uuid, string $filename)
+    public static function importDataFromFile(
+        string $uuid,
+        string $filename,
+        ?DateTime $sendOn = null,
+        ?string $message = null)
     {
         /** @var GiftAdoption $adoptionEntity */
         $adoptionEntity = DoctrineService::getEntityManager()->getRepository(DonationEntity::class)->find($uuid);
@@ -45,6 +50,14 @@ class RecipientFileService extends FileService
             if ($lineIndex - 8 !== $adoptionEntity->getQuantity()) {
                 unlink($filename);
                 throw new \Exception("Le nombre de noms renseignés est incorrect", 400);
+            }
+
+            if($message) {
+                $adoptionEntity->setMessage($message);
+            }
+
+            if($sendOn) {
+                $adoptionEntity->setSendOn($sendOn);
             }
 
             DoctrineService::getEntityManager()->commit();

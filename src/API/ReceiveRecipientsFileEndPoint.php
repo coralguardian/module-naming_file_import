@@ -23,7 +23,7 @@ class ReceiveRecipientsFileEndPoint extends APIEnpointAbstract
         try {
             $filename = tempnam("/tmp", "") . ".xlsx";
             move_uploaded_file($_FILES['recipient_file']["tmp_name"], $filename);
-            RecipientFileService::importDataFromFile($adoptionUuid, $filename);
+            RecipientFileService::importDataFromFile($adoptionUuid, $filename, $_POST['sendOn'] ?? null, $_POST['message'] ?? null);
 
             return APIManagement::APIOk();
         } catch (\Exception $exception) {
