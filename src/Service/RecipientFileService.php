@@ -60,14 +60,17 @@ class RecipientFileService extends FileService
                 $adoptionEntity->setSendOn($sendOn);
             }
 
+            DoctrineService::getEntityManager()->flush();
             DoctrineService::getEntityManager()->commit();
         } catch (\Exception $exception) {
             DoctrineService::getEntityManager()->rollback();
-            throw new $exception;
+            throw $exception;
         }
 
-        foreach ($adoptionEntity->getGiftCodes() as $giftCode) {
-            GiftCodeSent::sendEvent($giftCode, 1);
+        if(is_null($sendOn)) {
+            foreach ($adoptionEntity->getGiftCodes() as $giftCode) {
+                GiftCodeSent::sendEvent($giftCode, 1);
+            }
         }
 
         RecipientDone::sendEvent($adoptionEntity);
