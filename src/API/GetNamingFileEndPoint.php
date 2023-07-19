@@ -15,7 +15,7 @@ class GetNamingFileEndPoint extends APIEnpointAbstract
         try {
             $filename = NamingFileService::fillFileAccordingToAdoption($request->get_param('adoptionUuid'), null);
 
-            return APIManagement::APIClientDownloadWithURL($filename, 'naming_file.xlsx');
+            return APIManagement::APIClientDownloadWithURL($filename, 'Noms-coraux-récifs.xls');
         } catch (\Exception $exception) {
             return APIManagement::APIError($exception->getMessage(), $exception->getCode());
         }
