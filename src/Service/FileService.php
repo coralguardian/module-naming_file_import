@@ -42,22 +42,6 @@ abstract class FileService
         return $xlsFilename;
     }
 
-    public static function getAdoptionEntity(string $filename): DonationEntity
-    {
-        $reader = new Xlsx();
-        $spreadsheet = $reader->load($filename);
-        $adoptionUUID = $spreadsheet->getSheet(0)->getCell('B5')->getValue();
-
-        /** @var AdoptionEntity | null $adoptionEntity */
-        $adoptionEntity = DoctrineService::getEntityManager()->getRepository(DonationEntity::class)->find($adoptionUUID);
-        if (null === $adoptionEntity) {
-            unlink($filename);
-            throw new \Exception("Impossible de retrouver l'adoption ", 400);
-        }
-
-        return $adoptionEntity;
-    }
-
     public static function fillFileAccordingToAdoption(?string $adoptionUuid, ?Language $forceLang)
     {
         if ($adoptionUuid !== null) {

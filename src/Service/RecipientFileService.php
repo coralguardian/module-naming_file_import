@@ -6,16 +6,27 @@ use D4rk0snet\Adoption\Entity\Friend;
 use D4rk0snet\Adoption\Entity\GiftAdoption;
 use D4rk0snet\Coralguardian\Event\GiftCodeSent;
 use D4rk0snet\Coralguardian\Event\RecipientDone;
+use D4rk0snet\Donation\Entity\DonationEntity;
 use D4rk0snet\GiftCode\Entity\GiftCodeEntity;
+use DateTime;
 use Hyperion\Doctrine\Service\DoctrineService;
 use PhpOffice\PhpSpreadsheet\Reader\Xlsx;
 
 class RecipientFileService extends FileService
 {
-    public static function importDataFromFile(string $filename, GiftAdoption $forceAdoptionEntity = null)
+    public static function importDataFromFile(
+        string $uuid,
+        string $filename,
+        ?DateTime $sendOn = null,
+        ?string $message = null)
     {
         /** @var GiftAdoption $adoptionEntity */
-        $adoptionEntity = $forceAdoptionEntity ?? self::getAdoptionEntity($filename);
+        $adoptionEntity = DoctrineService::getEntityManager()->getRepository(DonationEntity::class)->find($uuid);
+        if(!$adoptionEntity instanceof GiftAdoption || is_null($adoptionEntity)) {
+            unlink($filename);
+            throw new \Exception("Adoption non trouvé", 400);
+        }
+
         $reader = new Xlsx();
         $spreadsheet = $reader->load($filename);
         $lineIndex = 8;
@@ -41,14 +52,25 @@ class RecipientFileService extends FileService
                 throw new \Exception("Le nombre de noms renseignés est incorrect", 400);
             }
 
+            if($message) {
+                $adoptionEntity->setMessage($message);
+            }
+
+            if($sendOn) {
+                $adoptionEntity->setSendOn($sendOn);
+            }
+
+            DoctrineService::getEntityManager()->flush();
             DoctrineService::getEntityManager()->commit();
         } catch (\Exception $exception) {
             DoctrineService::getEntityManager()->rollback();
-            throw new $exception;
+            throw $exception;
         }
 
-        foreach ($adoptionEntity->getGiftCodes() as $giftCode) {
-            GiftCodeSent::sendEvent($giftCode, 1);
+        if(is_null($sendOn)) {
+            foreach ($adoptionEntity->getGiftCodes() as $giftCode) {
+                GiftCodeSent::sendEvent($giftCode, 1);
+            }
         }
 
         RecipientDone::sendEvent($adoptionEntity);
